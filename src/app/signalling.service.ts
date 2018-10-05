@@ -11,7 +11,7 @@ export class SignallingService {
 		this.connect();
 	}
 	connect() {
-		this.socket = io('http://192.168.26.230:3000');
+		this.socket = io('https://192.168.26.230:3000');
 	}
 	sendIce(ice: any, remoteUser: string) {
 		console.log('ice from service');
@@ -24,8 +24,8 @@ export class SignallingService {
 	connectUser(user: string) {
 		this.socket.emit('connect-user', { user: user });
 	}
-	sendOffer(offer: any, remoteUser: string) {
-		this.socket.emit('send-offer', { offer: offer, to: remoteUser });
+	sendOffer(offer: any, remoteUser: string, currentUser: string) {
+		this.socket.emit('send-offer', { offer: offer, to: remoteUser, from: currentUser });
 	}
 	sendAnswer(answer: any, remoteUser: string) {
 		this.socket.emit('send-answer', { answer: answer, to: remoteUser });

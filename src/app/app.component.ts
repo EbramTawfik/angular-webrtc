@@ -8,10 +8,12 @@ import { SignallingService } from './signalling.service';
 })
 export class AppComponent implements OnInit {
   name: string;
+  remoteUser: string;
   connectUser: string;
   localStream: MediaStream;
-  peerConnection: RTCPeerConnection;
-  peerConnection2: RTCPeerConnection;
+  remoteStream: MediaStream;
+  peerConnection: any;
+  peerConnection2: any;
   availableDevices: string[] = [];
 
   servers: any = null;
@@ -29,6 +31,7 @@ export class AppComponent implements OnInit {
     this.peerConnection2 = new RTCPeerConnection(this.servers);
     console.log('startedpeerConnection');
     this.listenRemote();
+    this.peerConnection2.ontrack = this.gotRemoteStream.bind(this);
   }
   listenRemote() {
     this._signallingService.onRemoteAnswer().subscribe((data) => {
@@ -47,12 +50,27 @@ export class AppComponent implements OnInit {
   addRemoteAnswer(answer) {
     this.peerConnection.setRemoteDescription(answer).then(
       () => {
-        console.log('added remote answe successfully')
+        console.log('added remote answer successfully')
+        this.localStream.getTracks().forEach(
+          track => {
+            this.peerConnection.addTrack(
+              track,
+              this.localStream
+            );
+          }
+        );
       },
       (err) => {
         console.warn('add remote answer failed' + err)
       }
     );
+  }
+  gotRemoteStream(e) {
+    console.log('added remote stream succesfully');
+    if (this.remoteVideo.nativeElement.srcObject !== e.streams[0]) {
+      this.remoteVideo.nativeElement.srcObject = e.streams[0];
+      console.log('added remote stream succesfully');
+    }
   }
   addRemoteIce(ice) {
     console.log('ice from remote ice');
@@ -68,18 +86,19 @@ export class AppComponent implements OnInit {
         }
       );
   }
-  addRemoteOffer(offer) {
-    this.peerConnection2.setRemoteDescription(offer).then(
+  addRemoteOffer(data) {
+    this.peerConnection2.setRemoteDescription(data.offer).then(
       () => {
-        console.log('added remote offer successfully')
-
+        console.log('added remote offer successfully');
+        this.sendRemoteAnswer(data.from);
       },
       (err) => {
         console.warn('add remote offer failed' + err)
       }
     );
   }
-  sendRemoteAnswer() {
+  sendRemoteAnswer(from) {
+    this.remoteUser = from;
     this.peerConnection2.createAnswer().then(
       this.onAnswerCreated.bind(this),
       this.onAnswerFail.bind(this)
@@ -87,12 +106,13 @@ export class AppComponent implements OnInit {
   }
   onAnswerCreated(description) {
     let answer = description;
+    console.info('answer created sucessfully')
     console.log(answer);
-    this.peerConnection.setLocalDescription(answer);
-    this._signallingService.sendAnswer(answer, this.connectUser);
+    this.peerConnection2.setLocalDescription(answer);
+    this._signallingService.sendAnswer(answer, this.remoteUser);
   }
   onAnswerFail(error) {
-    console.log('error creating answer' + error);
+    console.warn('error creating answer' + error);
   }
   start() {
     navigator.mediaDevices.getUserMedia({
@@ -112,14 +132,8 @@ export class AppComponent implements OnInit {
     this.localVideo.nativeElement.srcObject = stream;
     this.localStream = stream;
     this.getUserDevice();
-    //this.startPeerConnection();
   }
-  /*gotRemoteStream(stream) {
-    this.localVideo.nativeElement.srcObject = stream;
-    this.localStream = stream;
-    this.getUserDevice();
-    this.startPeerConnection();
-  }*/
+
   connectToUser() {
     if (this.connectUser) {
       this._signallingService.connectUser(this.connectUser);
@@ -144,7 +158,7 @@ export class AppComponent implements OnInit {
     let offer = description;
     console.log(offer);
     this.peerConnection.setLocalDescription(offer);
-    this._signallingService.sendOffer(offer, this.connectUser);
+    this._signallingService.sendOffer(offer, this.connectUser, this.name);
   }
   onOfferFailure(description) {
     console.log('failed to set description');
