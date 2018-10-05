@@ -21,7 +21,7 @@ export class AppComponent implements OnInit {
     offerToReceiveAudio: 1,
     offerToReceiveVideo: 1
   }
-
+//
   @ViewChild('localVideo') localVideo: ElementRef;
   @ViewChild('remoteVideo') remoteVideo: ElementRef;
   constructor(private _signallingService: SignallingService) {
