@@ -11,12 +11,13 @@ export class SignallingService {
 		this.connect();
 	}
 	connect() {
-		this.socket = io('https://192.168.26.230:3000');
+		this.socket = io('https://localhost:3000');
 	}
 	sendIce(ice: any, remoteUser: string) {
-		console.log('ice from service');
-		console.log(ice);
 		this.socket.emit('send-ice', { ice: ice, to: remoteUser });
+	}
+	sendPeerIce(ice: any, remoteUser: string) {
+		this.socket.emit('send-peer-ice', { ice: ice, to: remoteUser });
 	}
 	loginUser(user: string) {
 		this.socket.emit('login', { user: user });
@@ -47,6 +48,13 @@ export class SignallingService {
 	onRemoteAnswer(): Observable<any> {
 		return Observable.create(observer => {
 			this.socket.on('receive-answer', msg => {
+				observer.next(msg);
+			});
+		});
+	}
+	onPeerIce(): Observable<any> {
+		return Observable.create(observer => {
+			this.socket.on('receive-peer-ice', msg => {
 				observer.next(msg);
 			});
 		});
