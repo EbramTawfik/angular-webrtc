@@ -11,7 +11,7 @@ export class SignallingService {
 		this.connect();
 	}
 	connect() {
-		this.socket = io('https://localhost:3000');
+		this.socket = io('https://boiling-inlet-46760.herokuapp.com/');
 	}
 	sendIce(ice: any, remoteUser: string) {
 		this.socket.emit('send-ice', { ice: ice, to: remoteUser });

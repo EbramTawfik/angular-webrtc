@@ -8,6 +8,8 @@ import { SignallingService } from './signalling.service';
 })
 export class AppComponent implements OnInit {
   name: string;
+  isLogged = false;
+  isRemote = false;
   remoteUser: string;
   connectUser: string;
   localStream: MediaStream;
@@ -20,7 +22,7 @@ export class AppComponent implements OnInit {
   offerOptions: RTCOfferOptions = {
     offerToReceiveAudio: 1,
     offerToReceiveVideo: 1
-  }
+  };
 
   @ViewChild('localVideo') localVideo: ElementRef;
   @ViewChild('remoteVideo') remoteVideo: ElementRef;
@@ -64,6 +66,7 @@ export class AppComponent implements OnInit {
   }
   gotRemoteStream(e) {
     console.log('got peer-2 stream succesfully');
+    this.isRemote = true;
     if (this.remoteVideo.nativeElement.srcObject !== e.streams[0]) {
       this.remoteVideo.nativeElement.srcObject = e.streams[0];
       console.log('set peer-2 stream succesfully');
@@ -140,11 +143,14 @@ export class AppComponent implements OnInit {
     })
       .then(this.gotStream.bind(this))
       .catch(function (e) {
-        alert('getUserMedia() error: ' + e.name);
+        // alert('getUserMedia() error: ' + e.name);
       });
   }
   loginUser() {
-    this._signallingService.loginUser(this.name);
+    if (this.name) {
+      this._signallingService.loginUser(this.name);
+      this.isLogged = true;
+    }
   }
 
   gotStream(stream) {
@@ -191,11 +197,11 @@ export class AppComponent implements OnInit {
   }
   hangup() {
     this.localStream.getAudioTracks().forEach(tracks => {
-      window.alert(tracks.label);
+      // window.alert(tracks.label);
       tracks.stop();
     });
     this.localStream.getVideoTracks().forEach(tracks => {
-      window.alert(tracks.label);
+      // window.alert(tracks.label);
       tracks.stop();
     });
   }
@@ -206,7 +212,7 @@ export class AppComponent implements OnInit {
     this.localStream.getVideoTracks().forEach(tracks => {
       this.availableDevices.push(tracks.label);
     });
-    alert(this.availableDevices);
+    // alert(this.availableDevices);
   }
 
 }

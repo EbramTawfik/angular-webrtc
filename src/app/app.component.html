@@ -1,16 +1,42 @@
-<video #localVideo playsinline autoplay muted></video>
-<video #remoteVideo playsinline autoplay></video>
-<div>
-  <button #startButton [disabled]="startButtonDisabled" (click)="start()">Start</button>
-  <button #hangupButton [disabled]="hangupButtonDisabled" (click)="hangup()">Hang Up</button>
-  <br>
-  <label>Login Name:</label>
-  <input [(ngModel)]="name" type="text" name="name">
-  <br>
-  <button #loginButton (click)="loginUser()">Login</button>
-  <br>
-  <label>Connect To:</label>
-  <input [(ngModel)]="connectUser" type="text" name="name">
-  <br>
-  <button #connectButton (click)="connectToUser()">connect to</button>
+<div class="container">
+  <div class="row justify-content-md-center">
+    <div class="media-actions col-md-6">
+      <button type="button" class="btn btn-success" #startButton [disabled]="startButtonDisabled" (click)="start()">Start</button>
+      <button type="button" class="btn btn-danger" #hangupButton [disabled]="hangupButtonDisabled" (click)="hangup()">Hang
+        Up</button>
+    </div>
+  </div>
+  <div class="row justify-content-md-center">
+    <div class="col-12 col-md-6">
+      <video [ngClass]="{'remote': isRemote, 'box-shadow': isRemote}" #localVideo playsinline autoplay muted></video>
+      <video [class.remote]="!isRemote" #remoteVideo playsinline autoplay></video>
+    </div>
+
+  </div>
+  <div class="row justify-content-md-center">
+    <div class="col-12 col-md-6 text-center">
+      <br>
+      <form *ngIf="!isLogged" class="form">
+        <div class="col">
+          <input  [(ngModel)]="name" type="text" name="name" class="form-control" id="exampleInputEmail1"
+            aria-describedby="emailHelp" placeholder="Login Name">
+        </div>
+        <div class="col">
+          <button #loginButton (click)="loginUser()" class="btn btn-outline-warning mb-2">Login</button>
+        </div>
+      </form>
+      <br>
+
+      <form *ngIf="isLogged" class="form">
+          <p class="lead">you are logged in as {{name}}</p>
+        <div class="col">
+          <input [(ngModel)]="connectUser" type="text" name="connectto" class="form-control" id="connectto"
+            aria-describedby="emailHelp" placeholder="Remote user">
+        </div>
+        <div class="col">
+          <button #connectButton (click)="connectToUser()" class="btn btn-outline-warning mb-2">connect to</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
