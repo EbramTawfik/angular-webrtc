@@ -18,7 +18,23 @@ export class AppComponent implements OnInit {
   peerConnection2: any;
   availableDevices: string[] = [];
 
-  servers: any = null;
+
+  servers: any = {
+    iceServers: [{
+      url: 'turn:numb.viagenie.ca',
+      credential: 'muazkh',
+      username: 'webrtc@live.com'
+    },
+    {
+      urls: [
+        "stun:stun.l.google.com:19302",
+        "stun:stun1.l.google.com:19302",
+        "stun:stun2.l.google.com:19302"
+      ]
+    }]
+  };
+
+
   offerOptions: RTCOfferOptions = {
     offerToReceiveAudio: 1,
     offerToReceiveVideo: 1
